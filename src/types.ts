@@ -36,3 +36,7 @@ export interface ILoggerConfig {
   emergencyTransport?: Transport;
   timestamp?: boolean;
 }
+
+export interface IMessage {
+  [key: string]: unknown;
+}

@@ -1,7 +1,8 @@
-import { ILoggerConfig, LEVELS, LogLevel } from "./types";
+import { ILoggerConfig, IMessage, LEVELS, LogLevel } from "./types";
 
 export class Logger {
   _config: ILoggerConfig;
+  _meta: IMessage;
 
   constructor(config: ILoggerConfig) {
     this.config(config);
@@ -19,7 +20,7 @@ export class Logger {
     }
   }
 
-  log(level: LogLevel, message: unknown) {
+  log(level: LogLevel, message: IMessage) {
     if (this._config.logLevel < level) {
       return;
     }
@@ -35,42 +36,64 @@ export class Logger {
       [LogLevel.EMERGENCY]: this._config.emergencyTransport,
     };
 
+    const event = {
+      level: this._config.levels[level],
+      ...message,
+      ...this._meta,
+      ...(this._config.timestamp
+        ? {
+            timestamp: new Date().toLocaleString(),
+          }
+        : {}),
+    };
+
     if (transportMap[level]) {
-      transportMap[level].log(this._config, level, message);
+      transportMap[level].log(event);
     } else {
-      this._config.transport.log(this._config, level, message);
+      this._config.transport.log(event);
     }
   }
 
-  debug(message: unknown) {
+  debug(message: IMessage) {
     this.log(LogLevel.DEBUG, message);
   }
 
-  info(message: unknown) {
+  info(message: IMessage) {
     this.log(LogLevel.INFO, message);
   }
 
-  notice(message: unknown) {
+  notice(message: IMessage) {
     this.log(LogLevel.NOTICE, message);
   }
 
-  warning(message: unknown) {
+  warning(message: IMessage) {
     this.log(LogLevel.WARNING, message);
   }
 
-  error(message: unknown) {
+  error(message: IMessage) {
     this.log(LogLevel.ERROR, message);
   }
 
-  critical(message: unknown) {
+  critical(message: IMessage) {
     this.log(LogLevel.CRITICAL, message);
   }
 
-  alert(message: unknown) {
+  alert(message: IMessage) {
     this.log(LogLevel.ALERT, message);
   }
 
-  emergency(message: unknown) {
+  emergency(message: IMessage) {
     this.log(LogLevel.EMERGENCY, message);
+  }
+
+  addMeta(meta: IMessage) {
+    this._meta = {
+      ...this._meta,
+      ...meta,
+    };
+  }
+
+  clearMeta() {
+    this._meta = {};
   }
 }

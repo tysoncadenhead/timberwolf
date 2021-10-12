@@ -1,21 +1,13 @@
-import { ILoggerConfig, LogLevel } from "./types";
-
+import { IMessage } from "./types";
 import { Transport } from "./Transport";
 
 export class TestTransport extends Transport {
-  _history: Array<{ level: LogLevel; message: unknown }> = [];
+  _history: Array<IMessage> = [];
 
-  constructor() {
-    super();
-  }
+  log(event: IMessage) {
+    super.log(event);
 
-  log(config: ILoggerConfig, level: LogLevel, message: unknown) {
-    super.log(config, level, message);
-
-    this._history.push({
-      message,
-      level,
-    });
+    this._history.push(event);
   }
 
   currentState() {

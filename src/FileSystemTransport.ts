@@ -1,7 +1,6 @@
 import * as fs from "fs";
 
-import { ILoggerConfig, LogLevel } from "./types";
-
+import { IMessage } from "./types";
 import { Transport } from "./Transport";
 
 interface IFileSystemTransport {
@@ -16,16 +15,9 @@ export class FileSystemTransport extends Transport {
     this._config = config;
   }
 
-  log(config: ILoggerConfig, level: LogLevel, message: unknown) {
-    super.log(config, level, message);
+  log(event: IMessage) {
+    super.log(event);
 
-    fs.appendFileSync(
-      this._config.path,
-      `
-${this.renderLevel(config, level)} ${JSON.stringify(
-        message
-      )} ${this.renderTimestamp(config)}`,
-      "utf8"
-    );
+    fs.appendFileSync(this._config.path, "\n" + JSON.stringify(event), "utf8");
   }
 }

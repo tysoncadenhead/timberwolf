@@ -1,13 +1,11 @@
-import { ILoggerConfig, LogLevel } from "./types";
+import { IMessage } from "./types";
 
 export class Transport {
   _siblingLogger?: Transport;
 
-  constructor() {}
-
-  log(config: ILoggerConfig, level: LogLevel, message: unknown) {
+  log(event: IMessage) {
     if (this._siblingLogger) {
-      this._siblingLogger.log(config, level, message);
+      this._siblingLogger.log(event);
     }
   }
 
@@ -15,17 +13,5 @@ export class Transport {
     this._siblingLogger = transport;
 
     return this;
-  }
-
-  renderLevel(config: ILoggerConfig, level: LogLevel) {
-    return `[ ${config.levels[level]} ] -`;
-  }
-
-  renderTimestamp(config: ILoggerConfig) {
-    if (config.timestamp) {
-      return ` [ ${new Date().toString()} ]`;
-    }
-
-    return "";
   }
 }

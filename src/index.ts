@@ -1,11 +1,22 @@
-import { ConsoleTransport } from "./ConsoleTransport";
-import { Logger } from "./Logger";
+import { ILoggerConfig, IMessage, LogLevel } from "./types";
 
-export * from "./Logger";
-export * from "./Transport";
-export * from "./ConsoleTransport";
-export * from "./types";
+import { ConsoleTransport } from "./ConsoleTransport";
+import { FileSystemTransport } from "./FileSystemTransport";
+import { Logger } from "./Logger";
+import { TestTransport } from "./TestTransport";
+import { Transport } from "./Transport";
 
 export const logger = new Logger({
   transport: new ConsoleTransport(),
 });
+
+export {
+  ConsoleTransport,
+  Logger,
+  FileSystemTransport,
+  TestTransport,
+  Transport,
+  ILoggerConfig,
+  IMessage,
+  LogLevel,
+};
