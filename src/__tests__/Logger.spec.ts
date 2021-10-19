@@ -1,12 +1,8 @@
 import * as path from "path";
 
-import {
-  ConsoleTransport,
-  FileSystemTransport,
-  LogLevel,
-  Logger,
-  TestTransport,
-} from "..";
+import { ConsoleTransport, LogLevel, Logger, TestTransport } from "..";
+
+import { FileSystemTransport } from "../FileSystemTransport";
 
 describe("Logger", () => {
   const transport = new TestTransport().concat(new ConsoleTransport()).concat(
