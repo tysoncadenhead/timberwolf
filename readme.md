@@ -1,6 +1,6 @@
 # TimberWolf 2.0
 
-A Logger for Typescript
+An extremely lightweight dependency-free logger for Typescript
 
 ## Installation
 
@@ -11,6 +11,27 @@ NPM:
 Yarn:
 
 `yarn add timberwolf --save`
+
+## Example
+
+```js
+import { logger } from "timberwolf";
+
+logger.info("Hello World!"); 
+// "[ INFO ] Hello World!"
+
+logger.addMeta({
+  user: "John Doe",
+})
+
+logger.debug('Hi John!')
+// "[ DEBUG ] Hi John!", { user: "John Doe" }
+
+logger.error('Something went wrong!', { error: 'John did it' }) 
+// "[ ERROR ] Something went wrong!", { user: "John Doe", error: "John did it" }
+```
+
+```
 
 ## Usage
 
@@ -56,7 +77,7 @@ logger.setLogger(myLogger)
 
 The order of log priority is:
 
-```
+``
 {
   FATAL: 1,
   ERROR: 2,
