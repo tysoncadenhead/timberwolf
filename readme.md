@@ -1,4 +1,4 @@
-# TimberWolf
+# TimberWolf 2.0
 
 A Logger for Typescript
 
@@ -16,151 +16,67 @@ Yarn:
 
 ### Logging and levels
 
-There are 8 log levels from `emergency` to `debug`.
+There are 6 log levels from `fatal` to `trace`.
 
 ```js
 import { logger } from "timberwolf";
 
-logger.emergency({
-  /* ... */
-});
-logger.alert({
-  /* ... */
-});
-logger.critical({
-  /* ... */
-});
-logger.error({
-  /* ... */
-});
-logger.warning({
-  /* ... */
-});
-logger.notice({
-  /* ... */
-});
-logger.info({
-  /* ... */
-});
-logger.debug({
-  /* ... */
-});
-```
-
-You can also use the `log` method and pass in the log level:
-
-```js
-import { logger, LogLevel } from "timberwolf";
-
-logger.log(LogLevel.WARNING, {
-  /* ... */
-});
+logger.fatal(message: string, metaData?: object);
+logger.error(message: string, metaData?: object);
+logger.warn(message: string, metaData?: object);
+logger.info(message: string, metaData?: object);
+logger.debug(message: string, metaData?: object);
+logger.trace(message: string, metaData?: object);
 ```
 
 ### Configuration
 
-#### Set the transport
+#### Set the logger
 
-By default, the `ConsoleTransport` is used, which outputs logs to `console.log`. This can be overwritten by using the config method.
+Timberwolf uses a single function to output all logs.
 
-```js
-import * as path from "path";
-import { logger, FileSystemTransport } from "timberwolf";
-
-logger.config({
-  transport: new FileSystemTransport({
-    path: path.resolve(__dirname, "./logs"),
-  }),
-});
-```
-
-#### Merging multiple transports
-
-Every transport has a `concat` method that may be used to merge another transport into it:
+By default, the console logger is used, which outputs logs to `console.log`. This can be overwritten by using the `setLogger` method.
 
 ```js
-import * as path from "path";
-import { logger, FileSystemTransport, ConsoleTransport } from "timberwolf";
+import { logger , Logger, LogLevel } from "timberwolf";
 
-logger.config({
-  transport: new ConsoleTransport().concat(
-    new FileSystemTransport({ path: path.resolve(__dirname, "./logs") })
-  ),
-});
-```
+export const myLogger: Logger = (
+  logLevel: LogLevel,
+  msg: string,
+  meta?: object,
+) => {
+  // Log however you want
+};
 
-#### Set different transports for different log levels
-
-If you wish, you can set the transport on the log level. This will take precedence over setting `transport` globally.
-
-```js
-import * as path from "path";
-import { logger, FileSystemTransport } from "timberwolf";
-
-logger.config({
-  emergencyTransport: new FileSystemTransport({
-    path: path.resolve(__dirname, "./logs/emergency"),
-  }),
-  alertTransport: new FileSystemTransport({
-    path: path.resolve(__dirname, "./logs/alert"),
-  }),
-  criticalTransport: new FileSystemTransport({
-    path: path.resolve(__dirname, "./logs/critical"),
-  }),
-  errorTransport: new FileSystemTransport({
-    path: path.resolve(__dirname, "./logs/error"),
-  }),
-  warningTransport: new FileSystemTransport({
-    path: path.resolve(__dirname, "./logs/warning"),
-  }),
-  noticeTransport: new FileSystemTransport({
-    path: path.resolve(__dirname, "./logs/notice"),
-  }),
-  infoTransport: new FileSystemTransport({
-    path: path.resolve(__dirname, "./logs/info"),
-  }),
-  debugTransport: new FileSystemTransport({
-    path: path.resolve(__dirname, "./logs/debug"),
-  }),
-});
+// Set the logger to use myLogger
+logger.setLogger(myLogger)
 ```
 
 #### Setting the Log Level
 
+The order of log priority is:
+
+```
+{
+  FATAL: 1,
+  ERROR: 2,
+  WARN: 3,
+  INFO: 4,
+  DEBUG: 5,
+  TRACE: 6,
+}
+```
+
 Everything below the LogLevel will not be pushed into the transport and not logged.
+
+By default, the log level is set to `INFO` unless you provide a `LOG_LEVEL` environment variable, which will be parsed as a LogLevel.
+
+Additionally, you can set the log level any time using the `setLogLevel` method.
 
 ```js
 import { logger, LogLevel } from "timberwolf";
 
-logger.config({
-  logLevel: LogLevel.ERROR,
-});
-```
-
-#### Enabling timestamps
-
-```js
-import { logger } from "timberwolf";
-
-logger.config({
-  timestamp: true,
-});
-```
-
-### Using a custom transport
-
-For a transport to be valid, it must extend a `log` method tha calls `super.log` for chaining purposes. Here is the `ConsoleTransport` implementation:
-
-```js
-import { IMessage } from "./types";
-import { Transport } from "./Transport";
-
-export class ConsoleTransport extends Transport {
-  log(event: IMessage) {
-    super.log(event);
-    console.log(event);
-  }
-}
+logger.setLogLevel(LogLevel.ERROR);
 ```
 
 ### Adding meta data to every log
@@ -182,3 +98,5 @@ import { logger } from "timberwolf";
 
 logger.clearMeta();
 ```
+
+The metadata will be spread over the metadata object for every subsequent log.

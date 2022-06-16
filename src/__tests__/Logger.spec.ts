@@ -1,160 +1,147 @@
-import * as path from "path";
+import {logger} from '..';
+import {clear, memoryLogger, getLastLog, getLog} from '../loggers/memory';
+import {consoleLogger} from '../loggers/console';
+import {LogLevel} from '../types';
 
-import { ConsoleTransport, LogLevel, Logger, TestTransport } from "..";
-
-import { FileSystemTransport } from "../FileSystemTransport";
-
-describe("Logger", () => {
-  const transport = new TestTransport().concat(new ConsoleTransport()).concat(
-    new FileSystemTransport({
-      path: path.resolve(__dirname, `../../log`),
-    })
-  );
-  const logger = new Logger({
-    transport,
-    timestamp: true,
+describe('Log utility', () => {
+  beforeAll(() => {
+    logger.setLogger(memoryLogger);
   });
 
-  it("Should log", () => {
-    logger.log(LogLevel.CRITICAL, {
-      message: "Critical Error",
-    });
-
-    expect(transport.currentState().level).toEqual("CRITICAL");
-    expect(transport.currentState().message).toEqual("Critical Error");
+  beforeEach(() => {
+    clear();
+    logger.clearMeta();
   });
 
-  it("Should log debug", () => {
-    logger.debug({
-      message: "Hello",
-    });
-
-    expect(transport.currentState().level).toEqual("DEBUG");
-    expect(transport.currentState().message).toEqual("Hello");
+  afterAll(() => {
+    logger.setLogger(consoleLogger);
   });
 
-  it("Should log info", () => {
-    logger.info({
-      message: "Hello",
+  describe('Logging', () => {
+    it('Should handle fatal errors', () => {
+      logger.setLogLevel(LogLevel.FATAL);
+      logger.fatal('Some fatal error', {});
+
+      expect(getLastLog()).toEqual({
+        message: 'Some fatal error',
+        meta: {},
+        logLevel: LogLevel.FATAL,
+      });
     });
 
-    expect(transport.currentState().level).toEqual("INFO");
+    it('Should handle errors', () => {
+      logger.setLogLevel(LogLevel.ERROR);
+      logger.error('Some error', {});
+
+      expect(getLastLog()).toEqual({
+        message: 'Some error',
+        meta: {},
+        logLevel: LogLevel.ERROR,
+      });
+    });
+
+    it('Should handle warnings', () => {
+      logger.setLogLevel(LogLevel.WARN);
+      logger.warn('Some warning', {});
+
+      expect(getLastLog()).toEqual({
+        message: 'Some warning',
+        meta: {},
+        logLevel: LogLevel.WARN,
+      });
+    });
+
+    it('Should handle info', () => {
+      logger.setLogLevel(LogLevel.INFO);
+      logger.info('Some info', {});
+
+      expect(getLastLog()).toEqual({
+        message: 'Some info',
+        meta: {},
+        logLevel: LogLevel.INFO,
+      });
+    });
+
+    it('Should handle debugs', () => {
+      logger.setLogLevel(LogLevel.DEBUG);
+      logger.debug('Some debug', {});
+
+      expect(getLastLog()).toEqual({
+        message: 'Some debug',
+        meta: {},
+        logLevel: LogLevel.DEBUG,
+      });
+    });
+
+    it('Should handle traces', () => {
+      logger.setLogLevel(LogLevel.TRACE);
+      logger.trace('Some trace', {});
+
+      expect(getLastLog()).toEqual({
+        message: 'Some trace',
+        meta: {},
+        logLevel: LogLevel.TRACE,
+      });
+    });
   });
 
-  it("Should log notice", () => {
-    logger.notice({
-      message: "Hello",
+  describe('Levels', () => {
+    it('Should not log error if the log level is fatal', () => {
+      logger.setLogLevel(LogLevel.FATAL);
+      logger.error('Some error', {});
+
+      expect(getLog()).toEqual([]);
     });
 
-    expect(transport.currentState().level).toEqual("NOTICE");
+    it('Should not log warn if the log level is error', () => {
+      logger.setLogLevel(LogLevel.ERROR);
+      logger.warn('Some warning', {});
+
+      expect(getLog()).toEqual([]);
+    });
+
+    it('Should log warn if the log level is info', () => {
+      logger.setLogLevel(LogLevel.INFO);
+      logger.warn('Some warning', {});
+
+      expect(getLastLog()).toEqual({
+        message: 'Some warning',
+        meta: {},
+        logLevel: LogLevel.WARN,
+      });
+    });
   });
 
-  it("Should log warning", () => {
-    logger.warning({
-      message: "Hello",
+  describe('Meta', () => {
+    it('Should log meta that is passed in to the logger', () => {
+      logger.setLogLevel(LogLevel.WARN);
+      logger.warn('Some warning', {
+        foo: 'bar',
+      });
+
+      expect(getLastLog()).toEqual({
+        message: 'Some warning',
+        meta: {
+          foo: 'bar',
+        },
+        logLevel: LogLevel.WARN,
+      });
     });
 
-    expect(transport.currentState().level).toEqual("WARNING");
-  });
+    it('Should log meta that is global', () => {
+      logger.setLogLevel(LogLevel.WARN);
+      logger.addMeta({
+        foo: 'bar',
+      });
+      logger.warn('Some warning', {});
 
-  it("Should log error", () => {
-    logger.error({
-      message: "Hello",
+      expect(getLastLog()).toEqual({
+        message: 'Some warning',
+        meta: {
+          foo: 'bar',
+        },
+        logLevel: LogLevel.WARN,
+      });
     });
-
-    expect(transport.currentState().level).toEqual("ERROR");
-  });
-
-  it("Should log critical", () => {
-    logger.critical({
-      message: "Hello",
-    });
-
-    expect(transport.currentState().level).toEqual("CRITICAL");
-  });
-
-  it("Should log alert", () => {
-    logger.alert({
-      message: "Hello",
-    });
-
-    expect(transport.currentState().level).toEqual("ALERT");
-  });
-
-  it("Should log emergency", () => {
-    logger.emergency({
-      message: "Hello",
-    });
-
-    expect(transport.currentState().level).toEqual("EMERGENCY");
-  });
-
-  it("Should be possible to override the logger", () => {
-    const generalTransport = new TestTransport();
-    const infoTransport = new TestTransport();
-    const logger = new Logger({
-      transport: generalTransport,
-      infoTransport,
-    });
-
-    logger.info({
-      message: "Hello",
-    });
-
-    expect(infoTransport.currentState().message).toEqual("Hello");
-  });
-
-  it("Should log alert", () => {
-    const generalTransport = new TestTransport();
-    const logger = new Logger({
-      transport: generalTransport,
-      logLevel: LogLevel.EMERGENCY,
-    });
-
-    logger.alert({
-      message: "Hi",
-    });
-
-    expect(generalTransport.currentState()).toEqual(undefined);
-  });
-
-  it("Should be possible to add meta data", () => {
-    const generalTransport = new TestTransport();
-    const testLogger = new Logger({
-      transport: generalTransport,
-      logLevel: LogLevel.DEBUG,
-    });
-
-    testLogger.addMeta({
-      user: `Boba Fett`,
-    });
-
-    testLogger.warning({
-      message: "Hi Boba",
-    });
-
-    expect(generalTransport.currentState().message).toEqual("Hi Boba");
-    expect(generalTransport.currentState().user).toEqual("Boba Fett");
-
-    testLogger.addMeta({
-      type: "Bounty Hunter",
-    });
-
-    testLogger.warning({
-      message: "Still there?",
-    });
-
-    expect(generalTransport.currentState().message).toEqual("Still there?");
-    expect(generalTransport.currentState().user).toEqual("Boba Fett");
-    expect(generalTransport.currentState().type).toEqual("Bounty Hunter");
-
-    testLogger.clearMeta();
-
-    testLogger.warning({
-      message: "Gone?",
-    });
-
-    expect(generalTransport.currentState().message).toEqual("Gone?");
-    expect(generalTransport.currentState().user).toEqual(undefined);
   });
 });
