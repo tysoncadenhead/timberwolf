@@ -1,5 +1,5 @@
-import { Logger, LogLevel } from '../types';
-import { logLevelTypeMap } from '../logLevelTypeMap';
+import {Logger, LogLevel} from '../types';
+import {logLevelTypeMap} from '../logLevelTypeMap';
 
 export const consoleLogger: Logger = (
   logLevel: LogLevel,
@@ -8,7 +8,7 @@ export const consoleLogger: Logger = (
 ) => {
   const logType = logLevelTypeMap[logLevel];
 
-  console[logType](`[ ${logLevel} ] - ${msg}`, {
+  console[logType](`${msg}`, {
     ...meta,
   });
 };

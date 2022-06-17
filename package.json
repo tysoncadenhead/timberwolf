@@ -1,6 +1,6 @@
 {
   "name": "timberwolf",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": ".build/index.js",
   "author": "Tyson Cadenhead",
   "license": "Unlicense",
@@ -8,7 +8,8 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "test:watch": "jest --watchAll"
+    "test:watch": "jest --watchAll",
+    "release": "yarn build && NPM_TOKEN=$(grep NPM_TOKEN .env.local | cut -d \"=\" -f2) npm publish"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
