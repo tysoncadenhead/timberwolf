@@ -2,16 +2,20 @@ import {Logger, LogLevel} from './types';
 import {setLogLevel} from './logLevel';
 import {shouldLog} from './shouldLog';
 import {consoleLogger} from './loggers/console';
+import {metaMask} from './metaMask';
 
 let loggerFn: Logger = consoleLogger;
 
 let globalMeta = {};
+let useMetaMask = true;
 
 const log = (logLevel: LogLevel, msg: string, meta?: object) => {
-  loggerFn(logLevel, msg, {
+  const allMeta = {
     ...globalMeta,
     ...meta,
-  });
+  };
+
+  loggerFn(logLevel, msg, useMetaMask ? metaMask(allMeta) : allMeta);
 };
 
 const addMeta = (value: object) => {
@@ -61,6 +65,12 @@ export const logger = {
   },
   addMeta,
   clearMeta,
+  disableMetaMask: () => {
+    useMetaMask = false;
+  },
+  enableMetaMask: () => {
+    useMetaMask = true;
+  },
 };
 
 export {Logger, LogLevel};

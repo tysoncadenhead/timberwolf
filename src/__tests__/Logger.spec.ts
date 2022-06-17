@@ -11,6 +11,7 @@ describe('Log utility', () => {
   beforeEach(() => {
     clear();
     logger.clearMeta();
+    logger.setLogLevel(LogLevel.INFO);
   });
 
   afterAll(() => {
@@ -141,6 +142,94 @@ describe('Log utility', () => {
           foo: 'bar',
         },
         logLevel: LogLevel.WARN,
+      });
+    });
+  });
+
+  describe('Masking', () => {
+    it('Should mask sensitive keys', () => {
+      logger.info('Hello', {
+        password: 'pass123',
+      });
+
+      expect(getLastLog()).toEqual({
+        message: 'Hello',
+        meta: {
+          password: '******',
+        },
+        logLevel: LogLevel.INFO,
+      });
+    });
+
+    it('Should allow us to disable the meta mask', () => {
+      logger.disableMetaMask();
+
+      logger.info('Hello', {
+        password: 'pass123',
+      });
+
+      logger.enableMetaMask();
+
+      expect(getLastLog()).toEqual({
+        message: 'Hello',
+        meta: {
+          password: 'pass123',
+        },
+        logLevel: LogLevel.INFO,
+      });
+    });
+
+    it('Should mask nested sensitive keys', () => {
+      logger.info('Hello', {
+        user: {
+          password: 'pass123',
+        },
+      });
+
+      expect(getLastLog()).toEqual({
+        message: 'Hello',
+        meta: {
+          user: {
+            password: '******',
+          },
+        },
+        logLevel: LogLevel.INFO,
+      });
+    });
+
+    it('Should mask nested sensitive keys inside arrays', () => {
+      logger.info('Hello', {
+        users: [
+          {
+            password: 'pass123',
+          },
+        ],
+      });
+
+      expect(getLastLog()).toEqual({
+        message: 'Hello',
+        meta: {
+          users: [
+            {
+              password: '******',
+            },
+          ],
+        },
+        logLevel: LogLevel.INFO,
+      });
+    });
+
+    it('Should allow regular arrays', () => {
+      logger.info('Hello', {
+        userIds: ['1'],
+      });
+
+      expect(getLastLog()).toEqual({
+        message: 'Hello',
+        meta: {
+          userIds: ['1'],
+        },
+        logLevel: LogLevel.INFO,
       });
     });
   });

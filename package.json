@@ -1,6 +1,6 @@
 {
   "name": "timberwolf",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "main": ".build/index.js",
   "author": "Tyson Cadenhead",
   "license": "Unlicense",

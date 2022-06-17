@@ -121,3 +121,26 @@ logger.clearMeta();
 ```
 
 The metadata will be spread over the metadata object for every subsequent log.
+
+### Meta masking
+
+By default Timberwolf will mask sensitive keys in the metadata object. These are defined in the `metaMask.ts` file.
+
+If you want to disable this, you can use the `disableMetaMask` method.
+
+```js
+import { logger } from "timberwolf";
+
+logger.disableMetaMask();
+
+logger.info("Hello", {
+  password: "pass123",
+});
+// "[ INFO ] Hello", { password: "********" }
+
+logger.enableMetaMask();
+
+logger.info("Hello", {
+  password: "pass123",
+});
+```
