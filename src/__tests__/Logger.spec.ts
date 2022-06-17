@@ -233,4 +233,36 @@ describe('Log utility', () => {
       });
     });
   });
+
+  describe('Throw', () => {
+    it('Should throw the error message', () => {
+      expect(() => {
+        logger.fatal('Oops', {}).throw();
+      }).toThrow('Oops');
+    });
+
+    it('Should throw a custom error message', () => {
+      expect(() => {
+        logger.fatal('Oops', {}).throw('Custom message');
+      }).toThrow('Custom message');
+    });
+  });
+
+  describe('When', () => {
+    it('Should log when the condition is met', () => {
+      logger.when(true).info('Some message', {});
+
+      expect(getLastLog()).toEqual({
+        message: 'Some message',
+        meta: {},
+        logLevel: LogLevel.INFO,
+      });
+    });
+
+    it('Should not log when the condition is not met', () => {
+      logger.when(false).info('Some message', {});
+
+      expect(getLastLog()).toEqual(undefined);
+    });
+  });
 });

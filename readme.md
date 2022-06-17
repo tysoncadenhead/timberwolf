@@ -144,3 +144,29 @@ logger.info("Hello", {
   password: "pass123",
 });
 ```
+
+### Throwing errors
+
+There is a convenience method to throw an error after logging it. This is available for all log levels.
+
+```js
+import { logger } from "timberwolf";
+
+logger.fatal("Oops").throw();
+// Throws an error "Oops" after logging it
+
+logger.fatal("Oops").throw("Oh no");
+// Throws an error "Oh no" after logging "Oops"
+```
+
+### Conditional logging
+
+There is a convenience method `when` that only logs if the condition is truthy
+
+```js
+import { logger } from "timberwolf";
+
+logger.when(true).debug("Simon says");
+
+logger.when(false).warn("Simon didn't say it");
+```
