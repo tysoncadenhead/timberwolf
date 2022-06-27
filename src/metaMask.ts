@@ -14,7 +14,7 @@ const keysToMaskObject = keysToMask.reduce((prev, current) => {
 
 const MASK = '******';
 
-export const metaMask = (meta: any): object => {
+export const metaMask = <T>(meta: any): T => {
   if (isObject(meta)) {
     return Object.keys(meta).reduce((prev, key) => {
       const value = meta[key];
@@ -28,7 +28,7 @@ export const metaMask = (meta: any): object => {
           ? metaMask(value)
           : value,
       };
-    }, {});
+    }, {}) as T;
   }
 
   return meta;
