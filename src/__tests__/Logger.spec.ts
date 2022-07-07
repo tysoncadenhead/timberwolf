@@ -1,4 +1,4 @@
-import {logger} from '..';
+import {logger, prettyStringFormatter, defaultFormatter} from '..';
 import {clear, memoryLogger, getLastLog, getLog} from '../loggers/memory';
 import {consoleLogger} from '../loggers/console';
 import {LogLevel} from '../types';
@@ -263,6 +263,23 @@ describe('Log utility', () => {
       logger.when(false).info('Some message', {});
 
       expect(getLastLog()).toEqual(undefined);
+    });
+
+    it('Should allow chaining', () => {
+      logger
+        .setFormatter(prettyStringFormatter)
+        .info('Hello', {
+          foo: 'bar',
+        })
+        .setFormatter(defaultFormatter);
+
+      expect(getLastLog()).toEqual({
+        logLevel: 'INFO',
+        message: 'Hello',
+        meta: `{
+  \"foo\": \"bar\"
+}`,
+      });
     });
   });
 });

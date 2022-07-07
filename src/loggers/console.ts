@@ -1,5 +1,6 @@
 import {Logger, LogLevel} from '../types';
 import {logLevelTypeMap} from '../logLevelTypeMap';
+import {getFormatter} from '../formatter';
 
 export const consoleLogger: Logger = (
   logLevel: LogLevel,
@@ -8,7 +9,5 @@ export const consoleLogger: Logger = (
 ) => {
   const logType = logLevelTypeMap[logLevel];
 
-  console[logType](`${msg}`, {
-    ...meta,
-  });
+  console[logType](`${msg}`, getFormatter()(meta));
 };

@@ -22,9 +22,9 @@ export const metaMask = <T>(meta: any): T => {
         ...prev,
         [key]: keysToMaskObject[key]
           ? MASK
-          : typeof value === 'object' && Array.isArray(value)
+          : Array.isArray(value)
           ? value.map(metaMask)
-          : typeof value === 'object'
+          : isObject(value)
           ? metaMask(value)
           : value,
       };

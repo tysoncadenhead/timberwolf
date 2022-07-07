@@ -1,9 +1,10 @@
-import { Logger, LogLevel } from '../types';
+import {FormattedMeta, Logger, LogLevel} from '../types';
+import {getFormatter} from '../formatter';
 
 interface IMemory {
   logLevel: LogLevel;
   message: string;
-  meta?: object;
+  meta?: FormattedMeta;
 }
 
 let memory: IMemory[] = [];
@@ -16,7 +17,7 @@ export const memoryLogger: Logger = (
   memory.push({
     logLevel,
     message,
-    meta,
+    meta: getFormatter()(meta),
   });
 };
 

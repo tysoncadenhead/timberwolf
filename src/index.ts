@@ -1,20 +1,9 @@
 import {Logger, LogLevel} from './types';
-import {setLogLevel} from './logLevel';
-import {logTypes} from './logTypes';
-import {addMeta, clearMeta} from './globalMeta';
-import {disableMetaMask, enableMetaMask} from './metaMaskToggled';
-import {setLogger} from './loggerFn';
-import {when} from './utils';
 
-export const logger = {
-  ...logTypes,
-  when,
-  setLogLevel,
-  setLogger,
-  addMeta,
-  clearMeta,
-  disableMetaMask,
-  enableMetaMask,
-};
+export * from './loggers';
+export * from './formatters';
+import {LoggerClass} from './LoggerClass';
+
+export const logger = new LoggerClass();
 
 export {Logger, LogLevel};
